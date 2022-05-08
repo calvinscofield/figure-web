@@ -13,17 +13,22 @@ const isActive = ref(false)
 const avatarText = computed(() => store.getters.avatarText)
 const xs = useMediaQuery('(max-width: 768px)')
 const menu = useSessionStorage("menu", "home")
-const menus = reactive([{ path: "home", title: "首页" }, { path: "file", title: "文件" }, { path: "user", title: "用户" },
-{ path: "role", title: "角色" }, { path: "permission", title: "权限" }, { path: "about", title: "关于" }])
+const menus = reactive([{ index: "home", title: "首页" }, { index: "file", title: "文件" }, { index: "user", title: "用户" },
+{ index: "role", title: "角色" }, { index: "permission", title: "权限" }, { index: "about", title: "关于" }])
 const isFull = ref(false)
 const fullObj = reactive({
   "login": "登录", "register": "注册", "fileAdd": "上传文件", "fileEdit": "修改文件", "userAdd": "新增用户", "userEdit": "修改用户",
   "roleAdd": "新增角色", "roleEdit": "修改角色", "permissionAdd": "新增权限", "permissionEdit": "修改权限", "me": "个人中心"
 })
-const title1 = computed(() => menus.find(el => el.path == menu.value).title)
+const title1 = computed(() => {
+  const f = menus.find(el => el.index == menu.value)
+  return f ? f.title : ''
+})
 const title = ref('')
 
 router.afterEach((to, from) => {
+  isActive.value = false
+  menu.value = to.name
   isFull.value = Object.keys(fullObj).includes(to.name)
   title.value = fullObj[to.name]
 })
@@ -37,8 +42,6 @@ function toggleMenu() {
 }
 
 function selectMenu(index, indexPath, item, routeResult) {
-  isActive.value = false
-  menu.value = index
   router.push({ path: index == "home" ? '/' : '/' + index })
 }
 
@@ -71,7 +74,7 @@ onMounted(() => {
   <el-drawer custom-class="cal-drawer" :modal-class="'cal-modal' + (isActive && xs ? ' cal-is-active' : '')"
     v-model="isActive" :before-close="onBeforeClose" :with-header="false" :z-index="1999">
     <el-menu :default-active="menu" @select="selectMenu">
-      <el-menu-item v-for="menu in menus" :index="menu.path">{{ menu.title }}</el-menu-item>
+      <el-menu-item v-for="menu in menus" :index="menu.index">{{ menu.title }}</el-menu-item>
     </el-menu>
   </el-drawer>
   <el-container class="cal-container">
@@ -85,7 +88,8 @@ onMounted(() => {
       <img alt="Vue logo" class="logo" src="@/assets/logo.svg" />
       <nav>
         <el-menu :default-active="menu" class="cal-menu" mode="horizontal" @select="selectMenu">
-          <el-menu-item v-for="menu in menus" :index="menu.path">{{ menu.title }}</el-menu-item>
+          <el-menu-item v-for="menu in menus" :index="menu.index">{{ menu.title }}
+          </el-menu-item>
         </el-menu>
         <span class="cal-nav-title">{{ title1 }}</span>
       </nav>
