@@ -182,7 +182,7 @@ onUpdated(() => {
 
 <template>
   <main>
-    <el-button type="text" :icon="FullScreen" @click="fullScreen1">
+    <el-button text :icon="FullScreen" @click="fullScreen1">
     </el-button>
     <div id="perms"></div>
   </main>

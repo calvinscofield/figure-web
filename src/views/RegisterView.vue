@@ -74,7 +74,7 @@ function sendCode() {
           ElMessage.error(error.response ? error.response.data.error : error.message)
         })
       emailCode.sended = true
-      emailCode.count = 60
+      emailCode.count = 59
       let id
       function count() {
         if (--emailCode.count <= 0) {

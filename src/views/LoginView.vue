@@ -96,7 +96,7 @@ function sendCode() {
           ElMessage.error(error.response ? error.response.data.error : error.message)
         })
       emailCode.sended = true
-      emailCode.count = 60
+      emailCode.count = 59
       let id
       function count() {
         if (--emailCode.count <= 0) {
@@ -137,8 +137,8 @@ function sendCode() {
     </template>
     <el-form-item>
       <el-button type="primary" @click="login">登录</el-button>
-      <el-button v-if="loginMode != 'account'" type="text" @click="loginMode = 'account'">账号登录</el-button>
-      <el-button v-if="loginMode != 'email'" type="text" @click="loginMode = 'email'">邮箱登录</el-button>
+      <el-button v-if="loginMode != 'account'" type="primary" text @click="loginMode = 'account'">账号登录</el-button>
+      <el-button v-if="loginMode != 'email'" type="primary" text @click="loginMode = 'email'">邮箱登录</el-button>
     </el-form-item>
   </el-form>
   <router-link to="/register">创建账户</router-link>

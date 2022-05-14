@@ -284,7 +284,7 @@ onMounted(() => {
     </template>
 
     <template #append>
-      <el-button class="cal-load-btn" :disabled="loading" :loading="loading" type="text" @click="load">加载更多
+      <el-button class="cal-load-btn" :disabled="loading" :loading="loading" type="primary" text @click="load">加载更多
       </el-button>
     </template>
   </el-table>

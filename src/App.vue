@@ -73,7 +73,7 @@ onMounted(() => {
   <el-backtop />
   <el-drawer custom-class="cal-drawer" :modal-class="'cal-modal' + (isActive && xs ? ' cal-is-active' : '')"
     v-model="isActive" :before-close="onBeforeClose" :with-header="false" :z-index="1999">
-    <el-menu :default-active="menu" @select="selectMenu">
+    <el-menu :default-active="menu" class="cal-drawer-menu" @select="selectMenu">
       <el-menu-item v-for="menu in menus" :index="menu.index">{{ menu.title }}</el-menu-item>
     </el-menu>
   </el-drawer>
@@ -101,16 +101,16 @@ onMounted(() => {
         </svg>
       </a>
       <el-button class="cal-search" :icon="Search" :size="xs ? 'default' : 'large'" circle></el-button>
-      <el-button @click="login" class="avatar" :class="{ 'cal-is-active': isActive && xs }" type="text">
+      <span @click="login" class="avatar" :class="{ 'cal-is-active': isActive && xs }">
         <el-avatar style="--el-avatar-size: calc(var(--cal-header-height) - 10px)">{{ avatarText }}</el-avatar>
-      </el-button>
-      <el-button @click="toggleMenu" class="cal-hamburger" :class="{ 'cal-is-active': isActive && xs }" type="text">
+      </span>
+      <span @click="toggleMenu" class="cal-hamburger" :class="{ 'cal-is-active': isActive && xs }">
         <span class="cal-hamburger-container">
           <span class="cal-hamburger-top"></span>
           <span class="cal-hamburger-middle"></span>
           <span class="cal-hamburger-bottom"></span>
         </span>
-      </el-button>
+      </span>
     </el-header>
     <el-main class="cal-main">
       <RouterView />
@@ -200,8 +200,13 @@ nav {
   flex-grow: 1;
 }
 
+.cal-drawer-menu {
+  border-right: none;
+}
+
 .cal-menu {
   flex-grow: 1;
+  border-bottom: none;
 }
 
 .cal-nav-title {
@@ -223,6 +228,7 @@ nav {
 }
 
 .avatar {
+  cursor: pointer;
   transition: all 0.3s ease-out;
   margin: auto;
   margin-left: 1rem !important;
@@ -259,14 +265,13 @@ nav {
 }
 
 .cal-hamburger {
-  width: 30px;
-  height: var(--cal-header-height);
-  margin-left: 0 !important;
+  margin: auto 0;
   margin-right: 1rem;
   display: none;
 }
 
 .cal-hamburger-container {
+  display: inline-block;
   position: relative;
   width: 16px;
   height: 14px;
