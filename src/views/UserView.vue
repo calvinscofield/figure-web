@@ -14,7 +14,7 @@ const form = reactive({})
 const checked = reactive({})
 const roles = ref([])
 const selectedRoles = ref([])
-const xs = useMediaQuery('(max-width: 768px)')
+const xxs = useMediaQuery('(max-width: 528px)')
 
 const cancel = () => {
   router.back();
@@ -69,7 +69,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <el-form :model="form" label-width="auto" :label-position="xs ? 'top' : 'left'">
+  <el-form :model="form" label-width="auto" :label-position="xxs ? 'top' : 'left'">
     <el-form-item label="用户名">
       <template #label="scope">
         <el-checkbox v-if="isEdit" v-model="checked.username" :label="scope.label" />
@@ -169,17 +169,17 @@ onMounted(() => {
       <el-date-picker :disabled="v(isEdit, checked.credentialsExpiryTime, 'user:credentialsExpiryTime:w')"
         v-model="form.credentialsExpiryTime" type="datetime" style="width: 100%;" />
     </el-form-item>
-    <el-form-item label="启用">
+    <el-form-item label="禁用">
       <template #label="scope">
-        <el-checkbox v-if="isEdit" v-model="checked.enabled" :label="scope.label" />
+        <el-checkbox v-if="isEdit" v-model="checked.disabled" :label="scope.label" />
         <span v-else>{{ scope.label }}</span>
-        <el-tooltip v-if="!c('user:enabled:w')" content="需要【user:enabled:w】权限">
+        <el-tooltip v-if="!c('user:disabled:w')" content="需要【user:disabled:w】权限">
           <el-icon class="cal-icon">
             <lock />
           </el-icon>
         </el-tooltip>
       </template>
-      <el-switch :disabled="v(isEdit, checked.enabled, 'user:enabled:w')" v-model="form.enabled" />
+      <el-switch :disabled="v(isEdit, checked.disabled, 'user:disabled:w')" v-model="form.disabled" />
     </el-form-item>
     <el-form-item label="角色">
       <template #label="scope">

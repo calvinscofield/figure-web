@@ -19,7 +19,7 @@ const form = reactive({
 const checked = reactive({})
 const roles = ref([])
 const selectedRoles = ref([])
-const xs = useMediaQuery('(max-width: 768px)')
+const xxs = useMediaQuery('(max-width: 528px)')
 const isAll = ref(true)
 
 const cancel = () => {
@@ -107,7 +107,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <el-form :model="form" label-width="auto" :label-position="xs ? 'top' : 'left'">
+  <el-form :model="form" label-width="auto" :label-position="xxs ? 'top' : 'left'">
     <el-form-item label="名称">
       <template #label="scope">
         <el-checkbox v-if="isEdit" v-model="checked.name" :label="scope.label" />

@@ -12,7 +12,6 @@ const router = useRouter();
 const data = ref(store.getters.data("file"))
 const params = reactive(store.getters.params("file"))
 const loading = ref(false)
-const xs = useMediaQuery('(max-width: 768px)')
 const lg = useMediaQuery('(min-width: 1200px)')
 
 const get = () => {

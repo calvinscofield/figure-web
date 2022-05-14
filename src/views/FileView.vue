@@ -12,7 +12,7 @@ const router = useRouter();
 const props = defineProps(["id", "isEdit"]);
 const form = reactive({})
 const checked = reactive({})
-const xs = useMediaQuery('(max-width: 768px)')
+const xxs = useMediaQuery('(max-width: 528px)')
 const files = ref([])
 const loading = ref(false)
 
@@ -76,7 +76,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <el-form :model="form" label-width="auto" :label-position="xs ? 'top' : 'left'">
+  <el-form :model="form" label-width="auto" :label-position="xxs ? 'top' : 'left'">
     <el-form-item v-if="!isEdit" label="文件" prop="url">
       <template #label="scope">
         <el-checkbox v-if="isEdit" v-model="checked.url" :label="scope.label" />

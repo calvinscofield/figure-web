@@ -12,7 +12,6 @@ const router = useRouter()
 const data = ref(store.getters.data("permission"))
 const params = reactive(store.getters.params("permission"))
 const loading = ref(false)
-const xs = useMediaQuery('(max-width: 768px)')
 const lg = useMediaQuery('(min-width: 1200px)')
 
 const get = () => {

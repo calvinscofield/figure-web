@@ -9,7 +9,7 @@ import store from '@/store'
 
 const router = useRouter();
 const user = computed(() => store.state.user)
-const xs = useMediaQuery('(max-width: 768px)')
+const xxs = useMediaQuery('(max-width: 528px)')
 const isEditPassword = ref(false)
 const form = reactive({})
 function logout() {
@@ -40,7 +40,7 @@ function editPassword() {
 </script>
 <template>
   <el-dialog custom-class="cal-edit-password" v-model="isEditPassword" title="修改密码">
-    <el-form :model="form" :label-position="xs ? 'top' : 'left'" label-width="auto">
+    <el-form :model="form" :label-position="xxs ? 'top' : 'left'" label-width="auto">
       <el-form-item label="新密码" prop="password">
         <el-input v-model="form.password" type="password" show-password />
       </el-form-item>

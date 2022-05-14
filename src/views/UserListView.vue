@@ -12,7 +12,6 @@ const router = useRouter()
 const data = ref(store.getters.data("user"))
 const params = reactive(store.getters.params("user"))
 const loading = ref(false)
-const xs = useMediaQuery('(max-width: 768px)')
 const lg = useMediaQuery('(min-width: 1200px)')
 
 const get = () => {
@@ -104,7 +103,7 @@ onMounted(() => {
             <div>有效期</div>
             <div>锁定</div>
             <div>凭证有效期</div>
-            <div>启用</div>
+            <div>禁用</div>
           </div>
           <div class="cal-table-header">
             <div>角色</div>
@@ -190,8 +189,8 @@ onMounted(() => {
               </el-tooltip>
             </div>
             <div>
-              <span v-if="c('user:enabled:r')">{{ scope.row.enabled ? "是" : "否" }}</span>
-              <el-tooltip v-else content="需要【user:enabled:r】权限">
+              <span v-if="c('user:disabled:r')">{{ scope.row.disabled ? "是" : "否" }}</span>
+              <el-tooltip v-else content="需要【user:disabled:r】权限">
                 <el-icon>
                   <lock />
                 </el-icon>
@@ -331,10 +330,10 @@ onMounted(() => {
           </el-tooltip>
         </template>
       </el-table-column>
-      <el-table-column prop="enabled" label="启用">
+      <el-table-column prop="disabled" label="禁用">
         <template #default="scope">
-          <span v-if="c('user:enabled:r')">{{ scope.row.enabled ? "是" : "否" }}</span>
-          <el-tooltip v-else content="需要【user:enabled:r】权限">
+          <span v-if="c('user:disabled:r')">{{ scope.row.disabled ? "是" : "否" }}</span>
+          <el-tooltip v-else content="需要【user:disabled:r】权限">
             <el-icon>
               <lock />
             </el-icon>
