@@ -46,3 +46,9 @@ export function isDisabled(isEdit, checked, perm) {
     if (!isEdit && checked == undefined) checked = true
     return !(checked && check(perm))
 }
+
+export function viewUrl(id, height) {
+    let url = `${window.location.protocol}//${window.location.host}/api/files/view/${id}`
+    if (height) url += "?height=" + height
+    return url
+}

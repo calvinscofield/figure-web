@@ -6,7 +6,7 @@ import { Lock } from '@element-plus/icons-vue'
 import { useMediaQuery } from '@vueuse/core'
 import axios from 'axios'
 import store from '@/store'
-import { check as c, formatDate } from '@/util'
+import { check as c, formatDate, viewUrl } from '@/util'
 
 const router = useRouter()
 const data = ref(store.getters.data("user"))
@@ -91,9 +91,10 @@ onMounted(() => {
       <el-table-column>
         <template #header="scope">
           <div class="cal-table-header">
+            <div>头像</div>
             <div>用户名</div>
             <div>密码</div>
-            <div>名称</div>
+            <div>昵称</div>
           </div>
           <div class="cal-table-header">
             <div>邮箱</div>
@@ -120,6 +121,17 @@ onMounted(() => {
         </template>
         <template #default="scope">
           <div class="cal-table-header">
+            <div>
+              <template v-if="c('user:avatar:r')">
+                <img class="cal-img" v-if="scope.row.avatar" @click="viewFile(scope.row)"
+                  :src="viewUrl(scope.row.avatar.id, 100)" :alt="scope.row.name" height="60" />
+              </template>
+              <el-tooltip v-else content="需要【user:avatar:r】权限">
+                <el-icon>
+                  <lock />
+                </el-icon>
+              </el-tooltip>
+            </div>
             <div>
               <span v-if="c('user:username:r')">{{ scope.row.username }}</span>
               <el-tooltip v-else content="需要【user:username:r】权限">
@@ -250,6 +262,19 @@ onMounted(() => {
       </el-table-column>
     </template>
     <template v-else>
+      <el-table-column prop="avatar" label="头像">
+        <template #default="scope">
+          <template v-if="c('user:avatar:r')">
+            <img class="cal-img" v-if="scope.row.avatar" @click="viewFile(scope.row)"
+              :src="viewUrl(scope.row.avatar.id, 100)" :alt="scope.row.name" height="60" />
+          </template>
+          <el-tooltip v-else content="需要【user:avatar:r】权限">
+            <el-icon>
+              <lock />
+            </el-icon>
+          </el-tooltip>
+        </template>
+      </el-table-column>
       <el-table-column prop="username" label="用户名">
         <template #default="scope">
           <span v-if="c('user:username:r')">{{ scope.row.username }}</span>
@@ -270,7 +295,7 @@ onMounted(() => {
           </el-tooltip>
         </template>
       </el-table-column>
-      <el-table-column prop="name" label="名称">
+      <el-table-column prop="name" label="昵称">
         <template #default="scope">
           <span v-if="c('user:name:r')">{{ scope.row.name }}</span>
           <el-tooltip v-else content="需要【user:name:r】权限">
@@ -310,7 +335,7 @@ onMounted(() => {
           </el-tooltip>
         </template>
       </el-table-column>
-      <el-table-column prop="locked" label="锁定">
+      <el-table-column prop="locked" label="锁定" width="60">
         <template #default="scope">
           <span v-if="c('user:locked:r')">{{ scope.row.locked ? "是" : "否" }}</span>
           <el-tooltip v-else content="需要【user:locked:r】权限">
@@ -330,7 +355,7 @@ onMounted(() => {
           </el-tooltip>
         </template>
       </el-table-column>
-      <el-table-column prop="disabled" label="禁用">
+      <el-table-column prop="disabled" label="禁用" width="60">
         <template #default="scope">
           <span v-if="c('user:disabled:r')">{{ scope.row.disabled ? "是" : "否" }}</span>
           <el-tooltip v-else content="需要【user:disabled:r】权限">

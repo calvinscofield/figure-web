@@ -36,6 +36,9 @@ const store = createStore({
         isLogin: (state) => {
             return state.user != null && state.user.username != "anonymous"
         },
+        avatar: (state) => {
+            return state.user != null ? state.user.avatar : null
+        },
         avatarText: (state) => {
             let text = "登录"
             if (state.user != null && state.user.username != "anonymous") {

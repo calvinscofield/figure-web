@@ -2,17 +2,22 @@
 import { ref, reactive, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
-import { Lock } from '@element-plus/icons-vue'
+import { Lock, View } from '@element-plus/icons-vue'
 import { useMediaQuery } from '@vueuse/core'
 import axios from 'axios'
 import store from '@/store'
-import { check as c, formatDate } from '@/util'
+import { check as c, formatDate, viewUrl } from '@/util'
 
 const router = useRouter();
 const data = ref(store.getters.data("file"))
 const params = reactive(store.getters.params("file"))
 const loading = ref(false)
 const lg = useMediaQuery('(min-width: 1200px)')
+const view = reactive({
+  isView: false,
+  name: null,
+  id: null
+})
 
 const get = () => {
   loading.value = true
@@ -75,9 +80,18 @@ const load = () => {
 onMounted(() => {
   if (data.value.length == 0) get();
 })
+
+function viewFile(row) {
+  view.isView = true
+  view.id = row.id
+  view.name = row.name
+}
 </script>
 
 <template>
+  <el-dialog custom-class="cal-view" v-model="view.isView" fullscreen :title="view.name">
+    <img :src="viewUrl(view.id)" :alt="view.name" />
+  </el-dialog>
   <el-button type="primary" @click="add">新增</el-button>
   <el-input v-model="params.keyword" placeholder="关键字" clearable @change="get" />
   <el-table :data="data">
@@ -85,11 +99,14 @@ onMounted(() => {
       <el-table-column>
         <template #header="scope">
           <div class="cal-table-header">
-            <div>网址</div>
+            <div>预览</div>
             <div>名称</div>
           </div>
           <div class="cal-table-header">
-            <div>文件名称</div>
+            <div>文件名</div>
+          </div>
+          <div class="cal-table-header">
+            <div>原始文件名</div>
             <div>类型</div>
             <div>大小</div>
           </div>
@@ -106,8 +123,9 @@ onMounted(() => {
         <template #default="scope">
           <div class="cal-table-header">
             <div>
-              <span v-if="c('file:url:r')">{{ scope.row.url }}</span>
-              <el-tooltip v-else content="需要【file:url:r】权限">
+              <img class="cal-img" v-if="c('file:filename:r')" @click="viewFile(scope.row)"
+                :src="viewUrl(scope.row.id, 100)" :alt="scope.row.name" height="60" />
+              <el-tooltip v-else content="需要【file:filename:r】权限">
                 <el-icon>
                   <lock />
                 </el-icon>
@@ -126,6 +144,16 @@ onMounted(() => {
             <div>
               <span v-if="c('file:filename:r')">{{ scope.row.filename }}</span>
               <el-tooltip v-else content="需要【file:filename:r】权限">
+                <el-icon>
+                  <lock />
+                </el-icon>
+              </el-tooltip>
+            </div>
+          </div>
+          <div class="cal-table-header">
+            <div>
+              <span v-if="c('file:originalFilename:r')">{{ scope.row.originalFilename }}</span>
+              <el-tooltip v-else content="需要【file:originalFilename:r】权限">
                 <el-icon>
                   <lock />
                 </el-icon>
@@ -191,10 +219,11 @@ onMounted(() => {
       </el-table-column>
     </template>
     <template v-else>
-      <el-table-column prop="url" label="网址">
+      <el-table-column label="预览">
         <template #default="scope">
-          <span v-if="c('file:url:r')">{{ scope.row.url }}</span>
-          <el-tooltip v-else content="需要【file:url:r】权限">
+          <img class="cal-img" v-if="c('file:filename:r')" @click="viewFile(scope.row)"
+            :src="viewUrl(scope.row.id, 100)" :alt="scope.row.name" height="60" />
+          <el-tooltip v-else content="需要【file:filename:r】权限">
             <el-icon>
               <lock />
             </el-icon>
@@ -211,10 +240,20 @@ onMounted(() => {
           </el-tooltip>
         </template>
       </el-table-column>
-      <el-table-column prop="filename" label="文件名称">
+      <el-table-column prop="filename" label="文件名">
         <template #default="scope">
           <span v-if="c('file:filename:r')">{{ scope.row.filename }}</span>
           <el-tooltip v-else content="需要【file:filename:r】权限">
+            <el-icon>
+              <lock />
+            </el-icon>
+          </el-tooltip>
+        </template>
+      </el-table-column>
+      <el-table-column prop="originalFilename" label="原始文件名">
+        <template #default="scope">
+          <span v-if="c('file:originalFilename:r')">{{ scope.row.originalFilename }}</span>
+          <el-tooltip v-else content="需要【file:originalFilename:r】权限">
             <el-icon>
               <lock />
             </el-icon>
@@ -289,3 +328,19 @@ onMounted(() => {
     </template>
   </el-table>
 </template>
+<style>
+.cal-view .el-dialog__header {
+  display: none;
+}
+
+.cal-view .el-dialog__body {
+  overflow: auto;
+  display: flex;
+  padding: 0;
+  height: 100%;
+}
+
+.cal-view .el-dialog__body img {
+  margin: auto;
+}
+</style>

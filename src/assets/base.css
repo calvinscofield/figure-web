@@ -80,3 +80,15 @@ body {
 .cal-table-header div {
   flex-grow: 1;
 }
+
+.cal-upload {
+  width: 100%;
+}
+
+.cal-img {
+  cursor: pointer;
+}
+
+.cal-select {
+  width: 100%;
+}
