@@ -5,6 +5,36 @@ export function formatDate(jsonString) {
     return jsonString ? new Date(jsonString).toLocaleString() : ""
 }
 
+export const re = new RegExp("^(-?)([0-9]{1,6})(?:/([0-9]{1,2})(?:/([0-9]{1,2}))?)?$")
+
+export function solarText(value) {
+    if (!value) return ""
+    let arr = re.exec(value)
+    if (arr === null) return ""
+    let txt = '', bc = '', y = Number.parseInt(arr[2])
+    if (arr[1] === '-') {
+        bc = " BC"
+        y = y + 1
+    }
+    txt += y
+    if (arr[3] !== undefined)
+        txt += '/' + Number.parseInt(arr[3])
+    if (arr[4] !== undefined)
+        txt += '/' + Number.parseInt(arr[4])
+    return txt + bc
+}
+
+export function solarDate(value) {
+    if (!value) return new Date()
+    let arr = re.exec(value)
+    if (arr === null) return new Date()
+    let bc = arr[1] === '-' ? arr[1] : '+'
+    let y = '0'.repeat(6 - arr[2].length) + arr[2]
+    let m = arr[3] === undefined ? "01" : '0'.repeat(2 - arr[3].length) + arr[3]
+    let d = arr[4] === undefined ? "01" : '0'.repeat(2 - arr[4].length) + arr[4]
+    return new Date(`${bc}${y}-${m}-${d}T00:00:00.000`)
+}
+
 export function fieldToJson(isAll, metaFields) {
     let field = "*"
     if (!isAll) {

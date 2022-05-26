@@ -72,12 +72,7 @@ const load = () => {
     })
 }
 
-onBeforeMount(() => {
-  console.log("onBeforeMount-User", new Date().getMilliseconds())
-})
-
 onMounted(() => {
-  console.log("onMounted-User", new Date().getMilliseconds())
   if (data.value.length == 0) get();
 })
 

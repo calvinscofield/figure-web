@@ -92,3 +92,7 @@ body {
 .cal-select {
   width: 100%;
 }
+
+.cal-icon {
+  align-self: center;
+}

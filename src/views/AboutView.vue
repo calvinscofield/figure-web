@@ -1,30 +1,26 @@
 <script setup>
 const getMedia = () => {
   let video = document.querySelector("#video")
-  console.log(video.srcObject)
   if (video.srcObject) {
     video.srcObject.getTracks().forEach(track => track.stop())
   }
   navigator.mediaDevices.getUserMedia({ audio: true, video: { width: 200, height: 200, facingMode: value.value ? "user" : "environment" } })
     .then(stream => {
-      console.log("stream", stream)
       video.srcObject = stream
       video.play()
     })
     .catch(error => {
-      console.error("error", error)
+      console.error(error)
     })
 }
 const closeMedia = () => {
   let video = document.querySelector("#video")
-  console.log(video.srcObject)
   if (video.srcObject) {
     video.srcObject.getTracks().forEach(track => track.stop())
   }
 }
 
 const capture = () => {
-  console.log("capture")
   let canvas = document.querySelector("#canvas")
   let video = document.querySelector("#video")
   let ctx = canvas.getContext('2d')
@@ -32,7 +28,6 @@ const capture = () => {
   let cw = video.width
   canvas.height = ch
   canvas.width = cw
-  console.log(ch, cw)
   if (video.srcObject) {
     ctx.drawImage(video, 0, 0)
     let url = canvas.toDataURL('image/jpeg')

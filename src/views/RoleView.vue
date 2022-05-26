@@ -14,7 +14,7 @@ const router = useRouter();
 const props = defineProps(["id", "isEdit"]);
 const formRef = ref()
 const form = reactive({})
-const nameValidator = (rule, value, callback) => {
+const nameValidator = _.debounce((rule, value, callback) => {
   if (!value || value.length == 0) return callback()
   const params = { name: value }
   if (props.isEdit) params.excludeId = props.id
@@ -22,7 +22,7 @@ const nameValidator = (rule, value, callback) => {
     if (response.data.data) callback(new Error("名称已存在"))
     else callback()
   }).catch(error => callback(new Error(error.response ? error.response.data.error : error.message)))
-}
+}, 500)
 const checked = reactive({})
 const rules = computed(() => {
   for (let key in checked) {
@@ -31,7 +31,7 @@ const rules = computed(() => {
   return {
     name: checked.name || !props.isEdit ? [
       { required: true, message: '请输入名称' },
-      { validator: _.debounce(nameValidator, 500, { 'leading': true }) }
+      { validator: nameValidator }
     ] : []
   }
 })
@@ -62,6 +62,7 @@ const add = () => {
         })
     }
   })
+  nameValidator.flush()
 }
 
 const edit = () => {
@@ -86,6 +87,7 @@ const edit = () => {
         })
     }
   })
+  nameValidator.flush()
 }
 
 onMounted(() => {

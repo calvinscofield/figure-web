@@ -161,21 +161,12 @@ const fullScreen1 = () => {
       console.log(event)
     })
     .catch(error => {
-      console.log(error)
+      console.error(error)
     })
 }
 
-onBeforeMount(() => {
-  console.log("onBeforeMount-Home")
-})
-
 onMounted(() => {
-  console.log("onMounted-Home")
   addTreeDom(permsData.value)
-})
-
-onUpdated(() => {
-  console.log("onUpdated-Home")
 })
 
 </script>

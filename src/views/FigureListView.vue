@@ -1,36 +1,31 @@
 <script setup>
-import { ref, reactive, onMounted } from 'vue'
+import { ref, reactive, onMounted, onBeforeMount } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
-import { Lock, View } from '@element-plus/icons-vue'
+import { Lock } from '@element-plus/icons-vue'
 import { useMediaQuery } from '@vueuse/core'
 import axios from 'axios'
 import store from '@/store'
-import { check as c, formatDate, viewUrl } from '@/util'
+import { check as c, formatDate, solarText, solarDate, viewUrl } from '@/util'
 
-const router = useRouter();
-const data = ref(store.getters.data("file"))
-const params = reactive(store.getters.params("file"))
+const router = useRouter()
+const data = ref(store.getters.data("figure"))
+const params = reactive(store.getters.params("figure"))
 const loading = ref(false)
 const lg = useMediaQuery('(min-width: 1200px)')
-const view = reactive({
-  isView: false,
-  name: null,
-  id: null
-})
 
 const get = () => {
   loading.value = true
   params.offset = 0
   params.limit = 10
-  axios.get('/api/files', { params: params })
+  axios.get('/api/figures', { params: params })
     .then(response => {
       loading.value = false
       data.value = response.data.data
       params.offset = response.data.offset
       params.limit = response.data.limit
-      store.commit("setData", { "file": data.value })
-      store.commit("setParams", { "file": params })
+      store.commit("setData", { "figure": data.value })
+      store.commit("setParams", { "figure": params })
     })
     .catch(error => {
       loading.value = false
@@ -39,15 +34,19 @@ const get = () => {
 }
 
 const add = () => {
-  router.push('/file/add')
+  router.push('/figure/add')
+}
+
+const show = () => {
+  router.push('/figure/show')
 }
 
 const edit = row => {
-  router.push('/file/edit/' + row.id)
+  router.push('/figure/edit/' + row.id)
 }
 
 const del = row => {
-  axios.delete('/api/files/' + row.id)
+  axios.delete('/api/figures/' + row.id)
     .then(() => {
       ElMessage.success("删除成功")
       const el1 = data.value.findIndex(el => el.id == row.id)
@@ -60,13 +59,13 @@ const del = row => {
 
 const load = () => {
   loading.value = true
-  axios.get('/api/files', { params: params })
+  axios.get('/api/figures', { params: params })
     .then(response => {
       loading.value = false
       if (response.data.data.length > 0) {
         params.offset = response.data.offset
         params.limit = response.data.limit
-        store.commit('addData', { "file": response.data.data })
+        store.commit('addData', { "figure": response.data.data })
       } else {
         ElMessage.success("没有更多数据")
       }
@@ -81,34 +80,26 @@ onMounted(() => {
   if (data.value.length == 0) get();
 })
 
-function viewFile(row) {
-  view.isView = true
-  view.id = row.id
-  view.name = row.name
-}
 </script>
 
 <template>
-  <el-dialog custom-class="cal-view" v-model="view.isView" fullscreen :title="view.name">
-    <img :src="viewUrl(view.id)" :alt="view.name" />
-  </el-dialog>
   <el-button type="primary" @click="add">新增</el-button>
+  <el-button @click="show">展示</el-button>
   <el-input v-model="params.keyword" placeholder="关键字" clearable @change="get" />
   <el-table :data="data">
     <template v-if="!lg">
       <el-table-column>
         <template #header="scope">
           <div class="cal-table-header">
-            <div>预览</div>
-            <div>名称</div>
+            <div>肖像</div>
+            <div>名字</div>
           </div>
           <div class="cal-table-header">
-            <div>文件名</div>
+            <div>全名</div>
           </div>
           <div class="cal-table-header">
-            <div>原始文件名</div>
-            <div>类型</div>
-            <div>大小</div>
+            <div>生辰</div>
+            <div>忌辰</div>
           </div>
           <div class="cal-table-header">
             <div>备注</div>
@@ -123,27 +114,19 @@ function viewFile(row) {
         <template #default="scope">
           <div class="cal-table-header">
             <div>
-              <img class="cal-img" v-if="c('file:filename:r')" @click="viewFile(scope.row)"
-                :src="viewUrl(scope.row.id, 100)" :alt="scope.row.name" height="60" />
-              <el-tooltip v-else content="需要【file:filename:r】权限">
+              <template v-if="c('figure:portrait:r')">
+                <img class="cal-img" v-if="scope.row.portrait" @click="viewFile(scope.row)"
+                  :src="viewUrl(scope.row.portrait.id, 100)" :alt="scope.row.name" height="60" />
+              </template>
+              <el-tooltip v-else content="需要【figure:portrait:r】权限">
                 <el-icon>
                   <lock />
                 </el-icon>
               </el-tooltip>
             </div>
             <div>
-              <span v-if="c('file:name:r')">{{ scope.row.name }}</span>
-              <el-tooltip v-else content="需要【file:name:r】权限">
-                <el-icon>
-                  <lock />
-                </el-icon>
-              </el-tooltip>
-            </div>
-          </div>
-          <div class="cal-table-header">
-            <div>
-              <span v-if="c('file:filename:r')">{{ scope.row.filename }}</span>
-              <el-tooltip v-else content="需要【file:filename:r】权限">
+              <span v-if="c('figure:name:r')">{{ scope.row.name }}</span>
+              <el-tooltip v-else content="需要【figure:name:r】权限">
                 <el-icon>
                   <lock />
                 </el-icon>
@@ -152,24 +135,8 @@ function viewFile(row) {
           </div>
           <div class="cal-table-header">
             <div>
-              <span v-if="c('file:originalFilename:r')">{{ scope.row.originalFilename }}</span>
-              <el-tooltip v-else content="需要【file:originalFilename:r】权限">
-                <el-icon>
-                  <lock />
-                </el-icon>
-              </el-tooltip>
-            </div>
-            <div>
-              <span v-if="c('file:contentType:r')">{{ scope.row.contentType }}</span>
-              <el-tooltip v-else content="需要【file:contentType:r】权限">
-                <el-icon>
-                  <lock />
-                </el-icon>
-              </el-tooltip>
-            </div>
-            <div>
-              <span v-if="c('file:size:r')">{{ scope.row.size }}</span>
-              <el-tooltip v-else content="需要【file:size:r】权限">
+              <span v-if="c('figure:fullname:r')">{{ scope.row.fullname }}</span>
+              <el-tooltip v-else content="需要【figure:fullname:r】权限">
                 <el-icon>
                   <lock />
                 </el-icon>
@@ -178,8 +145,16 @@ function viewFile(row) {
           </div>
           <div class="cal-table-header">
             <div>
-              <span v-if="c('file:remark:r')">{{ scope.row.remark }}</span>
-              <el-tooltip v-else content="需要【file:remark:r】权限">
+              <span v-if="c('figure:birthday:r')">{{ solarText(scope.row.birthday) }}</span>
+              <el-tooltip v-else content="需要【figure:birthday:r】权限">
+                <el-icon>
+                  <lock />
+                </el-icon>
+              </el-tooltip>
+            </div>
+            <div>
+              <span v-if="c('figure:deathday:r')">{{ solarText(scope.row.deathday) }}</span>
+              <el-tooltip v-else content="需要【figure:deathday:r】权限">
                 <el-icon>
                   <lock />
                 </el-icon>
@@ -188,8 +163,16 @@ function viewFile(row) {
           </div>
           <div class="cal-table-header">
             <div>
-              <span v-if="c('file:createTime:r')">{{ formatDate(scope.row.createTime) }}</span>
-              <el-tooltip v-else content="需要【file:createTime:r】权限">
+              <span v-if="c('figure:remark:r')">{{ scope.row.remark }}</span>
+              <el-tooltip v-else content="需要【figure:remark:r】权限">
+                <el-icon>
+                  <lock />
+                </el-icon>
+              </el-tooltip>
+            </div>
+            <div>
+              <span v-if="c('figure:createTime:r')">{{ formatDate(scope.row.createTime) }}</span>
+              <el-tooltip v-else content="需要【figure:createTime:r】权限">
                 <el-icon>
                   <lock />
                 </el-icon>
@@ -198,8 +181,8 @@ function viewFile(row) {
           </div>
           <div class="cal-table-header">
             <div>
-              <span v-if="c('file:updateTime:r')">{{ formatDate(scope.row.updateTime) }}</span>
-              <el-tooltip v-else content="需要【file:updateTime:r】权限">
+              <span v-if="c('figure:updateTime:r')">{{ formatDate(scope.row.updateTime) }}</span>
+              <el-tooltip v-else content="需要【figure:updateTime:r】权限">
                 <el-icon>
                   <lock />
                 </el-icon>
@@ -219,61 +202,53 @@ function viewFile(row) {
       </el-table-column>
     </template>
     <template v-else>
-      <el-table-column label="预览">
+      <el-table-column prop="portrait" label="肖像">
         <template #default="scope">
-          <img class="cal-img" v-if="c('file:filename:r')" @click="viewFile(scope.row)"
-            :src="viewUrl(scope.row.id, 100)" :alt="scope.row.name" height="60" />
-          <el-tooltip v-else content="需要【file:filename:r】权限">
+          <template v-if="c('figure:portrait:r')">
+            <img class="cal-img" v-if="scope.row.portrait" @click="viewFile(scope.row)"
+              :src="viewUrl(scope.row.portrait.id, 100)" :alt="scope.row.name" height="60" />
+          </template>
+          <el-tooltip v-else content="需要【figure:portrait:r】权限">
             <el-icon>
               <lock />
             </el-icon>
           </el-tooltip>
         </template>
       </el-table-column>
-      <el-table-column prop="name" label="名称">
+      <el-table-column prop="name" label="名字">
         <template #default="scope">
-          <span v-if="c('file:name:r')">{{ scope.row.name }}</span>
-          <el-tooltip v-else content="需要【file:name:r】权限">
+          <span v-if="c('figure:name:r')">{{ scope.row.name }}</span>
+          <el-tooltip v-else content="需要【figure:name:r】权限">
             <el-icon>
               <lock />
             </el-icon>
           </el-tooltip>
         </template>
       </el-table-column>
-      <el-table-column prop="filename" label="文件名">
+      <el-table-column prop="fullname" label="全名">
         <template #default="scope">
-          <span v-if="c('file:filename:r')">{{ scope.row.filename }}</span>
-          <el-tooltip v-else content="需要【file:filename:r】权限">
+          <span v-if="c('figure:fullname:r')">{{ scope.row.fullname }}</span>
+          <el-tooltip v-else content="需要【figure:fullname:r】权限">
             <el-icon>
               <lock />
             </el-icon>
           </el-tooltip>
         </template>
       </el-table-column>
-      <el-table-column prop="originalFilename" label="原始文件名">
+      <el-table-column prop="birthday" label="生辰">
         <template #default="scope">
-          <span v-if="c('file:originalFilename:r')">{{ scope.row.originalFilename }}</span>
-          <el-tooltip v-else content="需要【file:originalFilename:r】权限">
+          <span v-if="c('figure:birthday:r')">{{ solarText(scope.row.birthday) }}</span>
+          <el-tooltip v-else content="需要【figure:birthday:r】权限">
             <el-icon>
               <lock />
             </el-icon>
           </el-tooltip>
         </template>
       </el-table-column>
-      <el-table-column prop="contentType" label="类型">
+      <el-table-column prop="deathday" label="忌辰">
         <template #default="scope">
-          <span v-if="c('file:contentType:r')">{{ scope.row.contentType }}</span>
-          <el-tooltip v-else content="需要【file:contentType:r】权限">
-            <el-icon>
-              <lock />
-            </el-icon>
-          </el-tooltip>
-        </template>
-      </el-table-column>
-      <el-table-column prop="size" label="大小">
-        <template #default="scope">
-          <span v-if="c('file:size:r')">{{ scope.row.size }}</span>
-          <el-tooltip v-else content="需要【file:size:r】权限">
+          <span v-if="c('figure:deathday:r')">{{ solarText(scope.row.deathday) }}</span>
+          <el-tooltip v-else content="需要【figure:deathday:r】权限">
             <el-icon>
               <lock />
             </el-icon>
@@ -282,8 +257,8 @@ function viewFile(row) {
       </el-table-column>
       <el-table-column prop="remark" label="备注">
         <template #default="scope">
-          <span v-if="c('file:remark:r')">{{ scope.row.remark }}</span>
-          <el-tooltip v-else content="需要【file:remark:r】权限">
+          <span v-if="c('figure:remark:r')">{{ scope.row.remark }}</span>
+          <el-tooltip v-else content="需要【figure:remark:r】权限">
             <el-icon>
               <lock />
             </el-icon>
@@ -292,8 +267,8 @@ function viewFile(row) {
       </el-table-column>
       <el-table-column prop="createTime" label="创建时间">
         <template #default="scope">
-          <span v-if="c('file:createTime:r')">{{ formatDate(scope.row.createTime) }}</span>
-          <el-tooltip v-else content="需要【file:createTime:r】权限">
+          <span v-if="c('figure:createTime:r')">{{ formatDate(scope.row.createTime) }}</span>
+          <el-tooltip v-else content="需要【figure:createTime:r】权限">
             <el-icon>
               <lock />
             </el-icon>
@@ -302,8 +277,8 @@ function viewFile(row) {
       </el-table-column>
       <el-table-column prop="updateTime" label="更新时间">
         <template #default="scope">
-          <span v-if="c('file:updateTime:r')">{{ formatDate(scope.row.updateTime) }}</span>
-          <el-tooltip v-else content="需要【file:updateTime:r】权限">
+          <span v-if="c('figure:updateTime:r')">{{ formatDate(scope.row.updateTime) }}</span>
+          <el-tooltip v-else content="需要【figure:updateTime:r】权限">
             <el-icon>
               <lock />
             </el-icon>
@@ -328,19 +303,3 @@ function viewFile(row) {
     </template>
   </el-table>
 </template>
-<style>
-.cal-view .el-dialog__header {
-  padding: 0;
-}
-
-.cal-view .el-dialog__body {
-  overflow: auto;
-  display: flex;
-  padding: 0;
-  height: 100%;
-}
-
-.cal-view .el-dialog__body img {
-  margin: auto;
-}
-</style>

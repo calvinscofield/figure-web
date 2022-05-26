@@ -8,19 +8,19 @@ import _ from 'lodash'
 
 const router = useRouter();
 const xxs = useMediaQuery('(max-width: 528px)')
-const emailValidator = async (rule, value, callback) => {
+const emailValidator = _.debounce((rule, value, callback) => {
   axios.get("/api/users/exist", { params: { email: value } })
     .then(response => {
       if (response.data.data) callback(new Error("邮箱已注册"))
       else callback()
     }).catch(error => callback(new Error(error.response ? error.response.data.error : error.message)))
-}
+}, 500)
 const formRef = ref();
 const form = reactive({})
 const rules = reactive({
   email: [
     { required: true, message: '请输入邮箱' },
-    { validator: _.debounce(emailValidator, 500, { 'leading': true }) }
+    { validator: emailValidator }
   ],
   password: [
     { required: true, message: '请输入密码' }
@@ -59,6 +59,7 @@ const submitForm = () => {
       return false
     }
   })
+  emailValidator.flush()
 }
 
 const resetForm = (formRef) => {
@@ -94,6 +95,7 @@ function sendCode() {
         })
     }
   })
+  emailValidator.flush()
 }
 </script>
 

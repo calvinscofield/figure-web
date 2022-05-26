@@ -1,7 +1,7 @@
 <script setup>
 import { onBeforeMount, onMounted, ref, reactive } from 'vue'
 import { RouterView, useRouter } from 'vue-router'
-import { Search, Back } from '@element-plus/icons-vue'
+import { Search, Back, HomeFilled } from '@element-plus/icons-vue'
 import Github from '@/components/icons/Github.vue'
 import { useMediaQuery, useSessionStorage } from '@vueuse/core'
 import { computed } from '@vue/reactivity'
@@ -12,15 +12,16 @@ import { viewUrl } from '@/util'
 
 const router = useRouter()
 const isActive = ref(false)
+const hasBack = computed(() => window.history.length > 1)
 const avatarText = computed(() => store.getters.avatarText)
 const avatar = computed(() => store.getters.avatar)
 const xs = useMediaQuery('(max-width: 768px)')
 const menu = useSessionStorage("menu", "home")
-const menus = reactive([{ index: "home", title: "首页" }, { index: "file", title: "文件" }, { index: "user", title: "用户" },
+const menus = reactive([{ index: "home", title: "首页" }, { index: "figure", title: "人物" }, { index: "file", title: "文件" }, { index: "user", title: "用户" },
 { index: "role", title: "角色" }, { index: "permission", title: "权限" }, { index: "about", title: "关于" }])
 const isFull = ref(false)
 const fullObj = reactive({
-  "login": "登录", "register": "注册", "fileAdd": "上传文件", "fileEdit": "修改文件", "userAdd": "新增用户", "userEdit": "修改用户",
+  "login": "登录", "register": "注册", "figureShow": "人物秀", "fileAdd": "上传文件", "fileEdit": "修改文件", "userAdd": "新增用户", "userEdit": "修改用户",
   "roleAdd": "新增角色", "roleEdit": "修改角色", "permissionAdd": "新增权限", "permissionEdit": "修改权限", "me": "个人中心"
 })
 const title1 = computed(() => {
@@ -37,7 +38,7 @@ router.afterEach((to, from) => {
 })
 
 function goBack() {
-  router.back()
+  hasBack.value ? router.back() : router.replace({ path: '/' })
 }
 
 function toggleMenu() {
@@ -59,16 +60,11 @@ function login() {
 }
 
 onBeforeMount(() => {
-  console.log("onBeforeMount-App")
   axios.get("/api/users/me")
     .then(response => {
       store.commit("setUser", response.data.data)
     })
     .catch(error => ElMessage.error(error.response ? error.response.data.error : error.message))
-})
-
-onMounted(() => {
-  console.log("onMounted-App")
 })
 </script>
 
@@ -83,7 +79,8 @@ onMounted(() => {
   <el-container class="cal-container">
     <el-header v-if="isFull" class="cal-header">
       <el-icon @click="goBack" class="cal-back" :size="xs ? 28 : 32">
-        <back />
+        <back v-if="hasBack" />
+        <home-filled v-else />
       </el-icon>
       <span class="cal-title">{{ title }}</span>
     </el-header>

@@ -8,34 +8,33 @@ import store from '@/store'
 import _ from 'lodash'
 
 const router = useRouter()
-const usernameValidator = (rule, value, callback) => {
+const usernameValidator = _.debounce((rule, value, callback) => {
   axios.get("/api/users/exist", { params: { username: value, email: value, phone: value, matchMode: "any" } })
     .then(response => {
       if (!response.data.data) callback(new Error("用户名/邮箱/手机号不存在"))
       else callback()
     }).catch(error => callback(new Error(error.response ? error.response.data.error : error.message)))
-}
-const emailValidator = (rule, value, callback) => {
-  console.log("emailValidator", value)
+}, 500)
+const emailValidator = _.debounce((rule, value, callback) => {
   axios.get("/api/users/exist", { params: { email: value } })
     .then(response => {
       if (!response.data.data) callback(new Error("邮箱不存在"))
       else callback()
     }).catch(error => callback(new Error(error.response ? error.response.data.error : error.message)))
-}
+}, 500)
 const formRef = ref()
 const form = reactive({})
 const rules = reactive({
   username: [
     { required: true, message: '请输入用户名/邮箱/手机号', },
-    { validator: _.debounce(usernameValidator, 500, { 'leading': true }) }
+    { validator: usernameValidator }
   ],
   password: [
     { required: true, message: '请输入密码' }
   ],
   email: [
     { required: true, message: '请输入邮箱' },
-    { validator: _.debounce(emailValidator, 500, { 'leading': true }) }
+    { validator: emailValidator }
   ],
   code: [
     { required: true, message: '请输入验证码' }
@@ -84,6 +83,8 @@ function login() {
         })
     }
   })
+  usernameValidator.flush()
+  emailValidator.flush()
 }
 
 function sendCode() {
@@ -114,6 +115,7 @@ function sendCode() {
         })
     }
   })
+  emailValidator.flush()
 }
 </script>
 

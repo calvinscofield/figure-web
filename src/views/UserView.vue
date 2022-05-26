@@ -6,7 +6,7 @@ import { Plus, Delete, Lock } from '@element-plus/icons-vue'
 import axios from 'axios'
 import store from '@/store'
 import { useMediaQuery } from '@vueuse/core'
-import { check as c, isDisabled as v, viewUrl } from '../util'
+import { check as c, isDisabled as v, viewUrl } from '@/util'
 import { computed } from '@vue/reactivity'
 import _ from 'lodash'
 
@@ -14,7 +14,7 @@ const router = useRouter();
 const props = defineProps(["id", "isEdit"]);
 const formRef = ref()
 const form = reactive({})
-const usernameValidator = (rule, value, callback) => {
+const usernameValidator = _.debounce((rule, value, callback) => {
   if (!value || value.length == 0) return callback()
   const params = { username: value }
   if (props.isEdit) params.excludeId = props.id
@@ -22,8 +22,8 @@ const usernameValidator = (rule, value, callback) => {
     if (response.data.data) callback(new Error("用户名已存在"))
     else callback()
   }).catch(error => callback(new Error(error.response ? error.response.data.error : error.message)))
-}
-const nameValidator = (rule, value, callback) => {
+}, 500)
+const nameValidator = _.debounce((rule, value, callback) => {
   if (!value || value.length == 0) return callback()
   const params = { name: value }
   if (props.isEdit) params.excludeId = props.id
@@ -31,8 +31,8 @@ const nameValidator = (rule, value, callback) => {
     if (response.data.data) callback(new Error("昵称已存在"))
     else callback()
   }).catch(error => callback(new Error(error.response ? error.response.data.error : error.message)))
-}
-const emailValidator = (rule, value, callback) => {
+}, 500)
+const emailValidator = _.debounce((rule, value, callback) => {
   if (!value || value.length == 0) return callback()
   const params = { email: value }
   if (props.isEdit) params.excludeId = props.id
@@ -40,8 +40,8 @@ const emailValidator = (rule, value, callback) => {
     if (response.data.data) callback(new Error("邮箱已存在"))
     else callback()
   }).catch(error => callback(new Error(error.response ? error.response.data.error : error.message)))
-}
-const phoneValidator = (rule, value, callback) => {
+}, 500)
+const phoneValidator = _.debounce((rule, value, callback) => {
   if (!value || value.length == 0) return callback()
   const params = { phone: value }
   if (props.isEdit) params.excludeId = props.id
@@ -49,7 +49,7 @@ const phoneValidator = (rule, value, callback) => {
     if (response.data.data) callback(new Error("手机号已存在"))
     else callback()
   }).catch(error => callback(new Error(error.response ? error.response.data.error : error.message)))
-}
+}, 500)
 const avatarValidator = (rule, value, callback) => {
   if (value == null || !value.raw) {
     callback()
@@ -69,19 +69,19 @@ const rules = computed(() => {
   return {
     username: checked.username || !props.isEdit ? [
       { required: true, message: '请输入用户名' },
-      { validator: _.debounce(usernameValidator, 500, { 'leading': true }) }
+      { validator: usernameValidator }
     ] : [],
     password: checked.password || !props.isEdit ? [
       { required: true, message: '请输入密码' }
     ] : [],
     name: checked.name || !props.isEdit ? [
-      { validator: _.debounce(nameValidator, 500, { 'leading': true }) }
+      { validator: nameValidator }
     ] : [],
     email: checked.email || !props.isEdit ? [
-      { validator: _.debounce(emailValidator, 500, { 'leading': true }) }
+      { validator: emailValidator }
     ] : [],
     phone: checked.phone || !props.isEdit ? [
-      { validator: _.debounce(phoneValidator, 500, { 'leading': true }) }
+      { validator: phoneValidator }
     ] : [],
     avatar: checked.avatar || !props.isEdit ? [
       { validator: avatarValidator }
@@ -125,7 +125,10 @@ const add = () => {
         })
     }
   })
-
+  usernameValidator.flush()
+  nameValidator.flush()
+  emailValidator.flush()
+  phoneValidator.flush()
 }
 
 const edit = () => {
@@ -161,6 +164,10 @@ const edit = () => {
         })
     }
   })
+  usernameValidator.flush()
+  nameValidator.flush()
+  emailValidator.flush()
+  phoneValidator.flush()
 }
 
 onMounted(() => {

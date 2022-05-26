@@ -20,6 +20,28 @@ const router = createRouter({
       component: () => import('../views/RegisterView.vue')
     },
     {
+      path: '/figure/show',
+      name: 'figureShow',
+      component: () => import('../views/FigureShowView.vue')
+    },
+    {
+      path: '/figure',
+      name: 'figure',
+      component: () => import('../views/FigureListView.vue')
+    },
+    {
+      path: '/figure/add',
+      name: 'figureAdd',
+      component: () => import('../views/FigureView.vue'),
+      props: { isEdit: false, id: null }
+    },
+    {
+      path: '/figure/edit/:id',
+      name: 'figureEdit',
+      component: () => import('../views/FigureView.vue'),
+      props: route => ({ isEdit: true, id: route.params.id })
+    },
+    {
       path: '/file',
       name: 'file',
       component: () => import('../views/FileListView.vue')
