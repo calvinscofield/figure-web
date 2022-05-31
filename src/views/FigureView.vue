@@ -27,6 +27,8 @@ const portraitValidator = (rule, value, callback) => {
 const birthdayValidator = (rule, value, callback) => {
   let arr
   if (arr = re.exec(value)) {
+    let y = Number.parseInt(arr[2])
+    if (y === 0 && arr[1] === '-') return callback(new Error("年份为0时不要加负号"))
     if (arr[3] !== undefined) {
       let m = Number.parseInt(arr[3])
       if (m < 1 || m > 12) return callback(new Error("月1-12"))
@@ -136,12 +138,14 @@ const edit = () => {
   })
 }
 
+
+
 onMounted(() => {
   if (props.isEdit) {
     axios.get('/api/figures/' + props.id)
       .then(response => {
         Object.assign(form, response.data.data)
-        if (form.portrait != null) files.push({ url: viewUrl(form.portrait.id), name: form.portrait.originalFilename })
+        if (form.portrait != null) files.push({ url: viewUrl(form.portrait.id, "figure", "portrait"), name: form.portrait.originalFilename })
         store.commit('updateData', { "figure": form })
       })
       .catch(error => {

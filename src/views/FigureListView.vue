@@ -80,6 +80,10 @@ onMounted(() => {
   if (data.value.length == 0) get();
 })
 
+function src(id) {
+  return viewUrl(id, "figure", "portrait", 100)
+}
+
 </script>
 
 <template>
@@ -109,14 +113,13 @@ onMounted(() => {
             <div>更新时间</div>
             <div>操作</div>
           </div>
-
         </template>
         <template #default="scope">
           <div class="cal-table-header">
             <div>
               <template v-if="c('figure:portrait:r')">
                 <img class="cal-img" v-if="scope.row.portrait" @click="viewFile(scope.row)"
-                  :src="viewUrl(scope.row.portrait.id, 100)" :alt="scope.row.name" height="60" />
+                  :src="src(scope.row.portrait.id)" :alt="scope.row.name" height="60" />
               </template>
               <el-tooltip v-else content="需要【figure:portrait:r】权限">
                 <el-icon>
@@ -206,7 +209,7 @@ onMounted(() => {
         <template #default="scope">
           <template v-if="c('figure:portrait:r')">
             <img class="cal-img" v-if="scope.row.portrait" @click="viewFile(scope.row)"
-              :src="viewUrl(scope.row.portrait.id, 100)" :alt="scope.row.name" height="60" />
+              :src="src(scope.row.portrait.id)" :alt="scope.row.name" height="60" />
           </template>
           <el-tooltip v-else content="需要【figure:portrait:r】权限">
             <el-icon>

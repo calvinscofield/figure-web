@@ -76,6 +76,9 @@ onMounted(() => {
   if (data.value.length == 0) get();
 })
 
+function src(id) {
+  return viewUrl(id, "user", "avatar", 100)
+}
 </script>
 
 <template>
@@ -119,7 +122,7 @@ onMounted(() => {
             <div>
               <template v-if="c('user:avatar:r')">
                 <img class="cal-img" v-if="scope.row.avatar" @click="viewFile(scope.row)"
-                  :src="viewUrl(scope.row.avatar.id, 100)" :alt="scope.row.name" height="60" />
+                  :src="src(scope.row.avatar.id)" :alt="scope.row.name" height="60" />
               </template>
               <el-tooltip v-else content="需要【user:avatar:r】权限">
                 <el-icon>
@@ -260,8 +263,8 @@ onMounted(() => {
       <el-table-column prop="avatar" label="头像">
         <template #default="scope">
           <template v-if="c('user:avatar:r')">
-            <img class="cal-img" v-if="scope.row.avatar" @click="viewFile(scope.row)"
-              :src="viewUrl(scope.row.avatar.id, 100)" :alt="scope.row.name" height="60" />
+            <img class="cal-img" v-if="scope.row.avatar" @click="viewFile(scope.row)" :src="src(scope.row.avatar.id)"
+              :alt="scope.row.name" height="60" />
           </template>
           <el-tooltip v-else content="需要【user:avatar:r】权限">
             <el-icon>

@@ -175,7 +175,7 @@ onMounted(() => {
     Promise.all([axios.get('/api/users/' + props.id), axios.get('/api/roles')])
       .then(response => {
         Object.assign(form, response[0].data.data)
-        if (form.avatar != null) files.push({ url: viewUrl(form.avatar.id), name: form.avatar.originalFilename })
+        if (form.avatar != null) files.push({ url: viewUrl(form.avatar.id, "user", "avatar"), name: form.avatar.originalFilename })
         store.commit('updateData', { "user": form })
         selectedRoles.value = form.role.map(el => el.id)
         roles.value = response[1].data.data

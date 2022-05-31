@@ -86,6 +86,7 @@ function viewFile(row) {
   view.id = row.id
   view.name = row.name
 }
+
 </script>
 
 <template>
@@ -124,7 +125,7 @@ function viewFile(row) {
           <div class="cal-table-header">
             <div>
               <img class="cal-img" v-if="c('file:filename:r')" @click="viewFile(scope.row)"
-                :src="viewUrl(scope.row.id, 100)" :alt="scope.row.name" height="60" />
+                :src="viewUrl(scope.row.id, null, null, 100)" :alt="scope.row.name" height="60" />
               <el-tooltip v-else content="需要【file:filename:r】权限">
                 <el-icon>
                   <lock />
@@ -222,7 +223,7 @@ function viewFile(row) {
       <el-table-column label="预览">
         <template #default="scope">
           <img class="cal-img" v-if="c('file:filename:r')" @click="viewFile(scope.row)"
-            :src="viewUrl(scope.row.id, 100)" :alt="scope.row.name" height="60" />
+            :src="viewUrl(scope.row.id, null, null, 100)" :alt="scope.row.name" height="60" />
           <el-tooltip v-else content="需要【file:filename:r】权限">
             <el-icon>
               <lock />

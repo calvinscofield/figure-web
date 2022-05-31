@@ -12,7 +12,7 @@ export function solarText(value) {
     let arr = re.exec(value)
     if (arr === null) return ""
     let txt = '', bc = '', y = Number.parseInt(arr[2])
-    if (arr[1] === '-') {
+    if (arr[1] === '-' || y === 0) {
         bc = " BC"
         y = y + 1
     }
@@ -28,8 +28,10 @@ export function solarDate(value) {
     if (!value) return new Date()
     let arr = re.exec(value)
     if (arr === null) return new Date()
-    let bc = arr[1] === '-' ? arr[1] : '+'
-    let y = '0'.repeat(6 - arr[2].length) + arr[2]
+    let bc = arr[1]
+    let y1 = Number.parseInt(arr[2])
+    if (y1 >= 10000) bc = '+'
+    let y = '0'.repeat((bc === '-' || bc === '+' ? 6 : 4) - ('' + y1).length) + y1
     let m = arr[3] === undefined ? "01" : '0'.repeat(2 - arr[3].length) + arr[3]
     let d = arr[4] === undefined ? "01" : '0'.repeat(2 - arr[4].length) + arr[4]
     return new Date(`${bc}${y}-${m}-${d}T00:00:00.000`)
@@ -77,8 +79,13 @@ export function isDisabled(isEdit, checked, perm) {
     return !(checked && check(perm))
 }
 
-export function viewUrl(id, height) {
+export function viewUrl(id, table, field, height) {
     let url = `${window.location.protocol}//${window.location.host}/api/files/view/${id}`
-    if (height) url += "?height=" + height
+    let arr = []
+    if (table) arr.push(`table=${table}`)
+    if (field) arr.push(`field=${field}`)
+    if (height) arr.push(`height=${height}`)
+    if (arr.length > 0)
+        url += '?' + arr.join("&")
     return url
 }

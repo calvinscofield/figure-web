@@ -18,7 +18,7 @@ const packet = (function () {
       let b = false
       for (let i = 0; i < column.length; i++) {
         const el1 = column[i];
-        const yb1 = y(el1._birthday), yd1 = y(el1._deathday), yb = y(el._birthday), yd = y(el._deathday)
+        const yb1 = y(el1._birthday), yd1 = Math.max(y(el1._deathday), yb1 + 70), yb = y(el._birthday), yd = Math.max(y(el._deathday), yb + 70)
         if (yb <= yd1 && yd >= yb1) { // 有交叉
           b = true
           break
@@ -36,6 +36,10 @@ const packet = (function () {
     } else return index
   }
 })()
+
+function src(id) {
+  return viewUrl(id, "figure", "portrait", 100)
+}
 
 onMounted(() => {
   axios.get('/api/figures')
@@ -65,6 +69,20 @@ onMounted(() => {
             d3.select("#current").remove()
           }
         })
+      let defs = svg.append('defs')
+      let circleTextFilter = defs
+        .append('filter')
+        .attr('id', 'circleTextBg')
+        .attr("x", -0.05)
+        .attr("y", -0.05)
+        .attr("width", 1.1)
+        .attr("height", 1.1)
+
+      circleTextFilter.append('feFlood')
+        .attr('flood-color', '#95d475')
+
+      circleTextFilter.append('feComposite')
+        .attr('in', 'SourceGraphic')
       svg.append("g")
         .attr("transform", `translate(${margin.left},0)`)
         .call(d3.axisLeft(y)).node()
@@ -72,7 +90,7 @@ onMounted(() => {
         const rectX = margin.left + 10 + 70 * el._column
         const rectY = y(el._birthday)
         const rectH = y(el._deathday) - y(el._birthday)
-        const href = el.portrait ? viewUrl(el.portrait.id, 100) : ''
+        const href = el.portrait ? src(el.portrait.id) : ''
         const p = el.deathday ? `${rectH - 4} a 4 4 1 1 1 -8 0` : `${rectH} h-8`
         const g = svg.append("g")
           .on("click", () => {
@@ -92,21 +110,19 @@ onMounted(() => {
               .attr("y2", rectY + rectH)
               .attr("stroke", "#95d475")
             g1.append("text")
-              .attr("x", margin.left)
+              .attr("x", rectX)
               .attr("y", rectY)
               .attr("dx", "0.35em")
-              .text(solarText(el.birthday))
-            g1.append("rect")
-              .attr("x", rectX)
-              .attr("y", rectY + rectH)
-              .attr("width", width - margin.left - margin.right)
-              .attr("height", "1em")
               .attr("fill", "white")
+              .attr('filter', 'url(#circleTextBg)')
+              .text(solarText(el.birthday))
             g1.append("text")
-              .attr("x", margin.left)
+              .attr("x", rectX)
               .attr("y", rectY + rectH)
               .attr("dx", "0.35em")
               .attr("dy", "1em")
+              .attr("fill", "white")
+              .attr('filter', 'url(#circleTextBg)')
               .text(solarText(el.deathday))
             g1.append("rect")
               .attr("x", margin.left)
@@ -116,14 +132,14 @@ onMounted(() => {
               .attr("fill-opacity", 0.5)
               .attr("fill", "steelblue")
             g1.append("text")
-              .attr("x", margin.left)
+              .attr("x", rectX)
               .attr("y", rectY)
               .attr("dx", "0.35em")
               .attr("dy", "1.2em")
               .attr("fill", "red")
               .text(el.fullname)
             g1.append("text")
-              .attr("x", margin.left)
+              .attr("x", rectX)
               .attr("y", rectY + rectH)
               .attr("dx", "0.35em")
               .attr("dy", "-0.2em")

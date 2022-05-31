@@ -21,8 +21,12 @@ const menus = reactive([{ index: "home", title: "首页" }, { index: "figure", t
 { index: "role", title: "角色" }, { index: "permission", title: "权限" }, { index: "about", title: "关于" }])
 const isFull = ref(false)
 const fullObj = reactive({
-  "login": "登录", "register": "注册", "figureShow": "人物秀", "fileAdd": "上传文件", "fileEdit": "修改文件", "userAdd": "新增用户", "userEdit": "修改用户",
-  "roleAdd": "新增角色", "roleEdit": "修改角色", "permissionAdd": "新增权限", "permissionEdit": "修改权限", "me": "个人中心"
+  "login": "登录", "register": "注册", "me": "个人中心",
+  "figureAdd": "新增人物", "figureEdit": "修改人物", "figureShow": "人物秀",
+  "fileAdd": "上传文件", "fileEdit": "修改文件",
+  "userAdd": "新增用户", "userEdit": "修改用户",
+  "roleAdd": "新增角色", "roleEdit": "修改角色",
+  "permissionAdd": "新增权限", "permissionEdit": "修改权限"
 })
 const title1 = computed(() => {
   const f = menus.find(el => el.index == menu.value)
@@ -103,7 +107,7 @@ onBeforeMount(() => {
       </a>
       <span @click="login" class="avatar" :class="{ 'cal-is-active': isActive && xs }">
         <el-avatar>
-          <img v-if="avatar" :src="viewUrl(avatar.id, 100)" />
+          <img v-if="avatar" :src="viewUrl(avatar.id, 'user', 'avatar', 100)" />
           <span v-else> {{ avatarText }}</span>
         </el-avatar>
       </span>
