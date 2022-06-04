@@ -50,7 +50,8 @@ function toggleMenu() {
 }
 
 function selectMenu(index) {
-  router.push({ path: index == "home" ? '/' : '/' + index })
+  const route = store.getters.route(index)
+  router.replace({ path: index == "home" ? '/' : '/' + index })
 }
 
 function onBeforeClose() {

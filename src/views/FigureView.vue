@@ -215,16 +215,14 @@ function removePortrait() {
           <Plus />
         </el-icon>
         <template #file="{ file }">
-          <div>
-            <img class="el-upload-list__item-thumbnail" :src="file.url" alt="" />
-            <span v-if="!v(isEdit, checked.portrait, 'figure:portrait:w')" class="el-upload-list__item-actions">
-              <span class="el-upload-list__item-delete" @click="removePortrait">
-                <el-icon>
-                  <Delete />
-                </el-icon>
-              </span>
+          <img class="el-upload-list__item-thumbnail" :src="file.url" alt="" />
+          <span v-if="!v(isEdit, checked.portrait, 'figure:portrait:w')" class="el-upload-list__item-actions">
+            <span class="el-upload-list__item-delete" @click="removePortrait">
+              <el-icon>
+                <Delete />
+              </el-icon>
             </span>
-          </div>
+          </span>
         </template>
       </el-upload>
     </el-form-item>

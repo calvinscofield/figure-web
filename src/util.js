@@ -79,12 +79,12 @@ export function isDisabled(isEdit, checked, perm) {
     return !(checked && check(perm))
 }
 
-export function viewUrl(id, table, field, height) {
+export function viewUrl(id, table, field, width) {
     let url = `${window.location.protocol}//${window.location.host}/api/files/view/${id}`
     let arr = []
     if (table) arr.push(`table=${table}`)
     if (field) arr.push(`field=${field}`)
-    if (height) arr.push(`height=${height}`)
+    if (width) arr.push(`width=${width}`)
     if (arr.length > 0)
         url += '?' + arr.join("&")
     return url

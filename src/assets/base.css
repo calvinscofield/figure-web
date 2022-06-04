@@ -87,6 +87,7 @@ body {
 
 .cal-img {
   cursor: pointer;
+  object-fit: cover;
 }
 
 .cal-select {
@@ -95,4 +96,10 @@ body {
 
 .cal-icon {
   align-self: center;
+}
+
+.cal-divider {
+  border-top: 1px #dcdfe6 solid;
+  width: 100%;
+  margin: 8px 0;
 }

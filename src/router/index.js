@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
+import store from '@/store'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -122,7 +123,24 @@ const router = createRouter({
       // which is lazy-loaded when the route is visited.
       component: () => import('../views/AboutView.vue')
     }
-  ]
+  ],
+  scrollBehavior(to, from, savedPosition) {
+    const route = store.getters.route(to.name)
+    if (route === undefined || to.params.id !== route.params.id) return { left: 0, top: 0 }
+    return route.meta.savedPosition
+  },
+})
+
+router.beforeEach((to, from) => {
+  console.log("beforeEach", to, from, window.scrollY)
+  console.log("hasRoute", router.hasRoute(to.name), router.hasRoute(from.name))
+  from.meta.savedPosition = { left: window.scrollX, top: window.scrollY }
+  store.commit("saveRoute", from)
+  //store.commit("saveRoute", to)
+  // if (to.name !== "user") {
+  //   return { name: "user", replace: true }
+  // }
+
 })
 
 export default router

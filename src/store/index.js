@@ -9,7 +9,8 @@ const store = createStore({
             //data存储每张表查询出来的记录 {"user": [{"id": 1,...}], "file": [{"id": 1,...}]}
             data: null,
             //params存储每张表查询参数 {"user": {"offset": 0,"limit": 10, "keywords": ""}, "file": {...}}
-            params: null
+            params: null,
+            routes: []
         }
     },
     getters: {
@@ -45,7 +46,8 @@ const store = createStore({
                 text = state.user.name || state.user.username
             }
             return text
-        }
+        },
+        route: (state) => (name) => state.routes.find(v => v.name === name)
     },
     mutations: {
         setVersion(state, payload) {
@@ -99,6 +101,14 @@ const store = createStore({
         updateParams(state, payload) {
             for (let key in payload) {
                 Object.assign(state.params[key], payload[key])
+            }
+        },
+        saveRoute(state, payload) {
+            const f = state.routes.find(v => v.name === payload.name)
+            if (f === undefined) {
+                state.routes.push(payload)
+            } else {
+                Object.assign(f, payload)
             }
         }
     }

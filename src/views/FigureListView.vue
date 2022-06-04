@@ -12,7 +12,7 @@ const router = useRouter()
 const data = ref(store.getters.data("figure"))
 const params = reactive(store.getters.params("figure"))
 const loading = ref(false)
-const lg = useMediaQuery('(min-width: 1200px)')
+const selection = reactive([])
 
 const get = () => {
   loading.value = true
@@ -90,219 +90,208 @@ function src(id) {
   <el-button type="primary" @click="add">新增</el-button>
   <el-button @click="show">展示</el-button>
   <el-input v-model="params.keyword" placeholder="关键字" clearable @change="get" />
-  <el-table :data="data">
-    <template v-if="!lg">
-      <el-table-column>
-        <template #header="scope">
-          <div class="cal-table-header">
-            <div>肖像</div>
-            <div>名字</div>
-          </div>
-          <div class="cal-table-header">
-            <div>全名</div>
-          </div>
-          <div class="cal-table-header">
-            <div>生辰</div>
-            <div>忌辰</div>
-          </div>
-          <div class="cal-table-header">
-            <div>备注</div>
-            <div>创建时间</div>
-          </div>
-          <div class="cal-table-header">
-            <div>更新时间</div>
-            <div>操作</div>
-          </div>
+  <div class="cal-table-figure-list">
+    <div class="cal-col1">
+      <div prop="portrait">肖像</div>
+      <div class="cal-col11">
+        <div prop="name">名字</div>
+        <div prop="birthday">生辰 - 忌辰</div>
+        <div prop="fullname">全名</div>
+      </div>
+    </div>
+    <div class="cal-col2">
+      <div class="cal-col11">
+        <div prop="remark">备注</div>
+        <div prop="createTime">创建时间</div>
+        <div prop="updateTime">更新时间</div>
+        <div prop="action">操作 </div>
+      </div>
+      <div prop="select">
+        <el-checkbox />
+      </div>
+    </div>
+  </div>
+
+  <div v-for="v in data" class="cal-table-figure-list">
+    <div class="cal-divider"></div>
+    <div class="cal-col1">
+      <div prop="portrait">
+        <template v-if="c('figure:portrait:r')">
+          <img class="cal-img" v-if="v.portrait" :src="src(v.portrait.id)" :alt="v.name" width="80" height="80" />
         </template>
-        <template #default="scope">
-          <div class="cal-table-header">
-            <div>
-              <template v-if="c('figure:portrait:r')">
-                <img class="cal-img" v-if="scope.row.portrait" @click="viewFile(scope.row)"
-                  :src="src(scope.row.portrait.id)" :alt="scope.row.name" height="60" />
-              </template>
-              <el-tooltip v-else content="需要【figure:portrait:r】权限">
-                <el-icon>
-                  <lock />
-                </el-icon>
-              </el-tooltip>
-            </div>
-            <div>
-              <span v-if="c('figure:name:r')">{{ scope.row.name }}</span>
-              <el-tooltip v-else content="需要【figure:name:r】权限">
-                <el-icon>
-                  <lock />
-                </el-icon>
-              </el-tooltip>
-            </div>
-          </div>
-          <div class="cal-table-header">
-            <div>
-              <span v-if="c('figure:fullname:r')">{{ scope.row.fullname }}</span>
-              <el-tooltip v-else content="需要【figure:fullname:r】权限">
-                <el-icon>
-                  <lock />
-                </el-icon>
-              </el-tooltip>
-            </div>
-          </div>
-          <div class="cal-table-header">
-            <div>
-              <span v-if="c('figure:birthday:r')">{{ solarText(scope.row.birthday) }}</span>
-              <el-tooltip v-else content="需要【figure:birthday:r】权限">
-                <el-icon>
-                  <lock />
-                </el-icon>
-              </el-tooltip>
-            </div>
-            <div>
-              <span v-if="c('figure:deathday:r')">{{ solarText(scope.row.deathday) }}</span>
-              <el-tooltip v-else content="需要【figure:deathday:r】权限">
-                <el-icon>
-                  <lock />
-                </el-icon>
-              </el-tooltip>
-            </div>
-          </div>
-          <div class="cal-table-header">
-            <div>
-              <span v-if="c('figure:remark:r')">{{ scope.row.remark }}</span>
-              <el-tooltip v-else content="需要【figure:remark:r】权限">
-                <el-icon>
-                  <lock />
-                </el-icon>
-              </el-tooltip>
-            </div>
-            <div>
-              <span v-if="c('figure:createTime:r')">{{ formatDate(scope.row.createTime) }}</span>
-              <el-tooltip v-else content="需要【figure:createTime:r】权限">
-                <el-icon>
-                  <lock />
-                </el-icon>
-              </el-tooltip>
-            </div>
-          </div>
-          <div class="cal-table-header">
-            <div>
-              <span v-if="c('figure:updateTime:r')">{{ formatDate(scope.row.updateTime) }}</span>
-              <el-tooltip v-else content="需要【figure:updateTime:r】权限">
-                <el-icon>
-                  <lock />
-                </el-icon>
-              </el-tooltip>
-            </div>
-            <div>
-              <el-button size="small" type="primary" @click="edit(scope.row)">编辑</el-button>
-              <el-popconfirm confirm-button-text="没错" cancel-button-text="斟酌一下" title="确定要删除？"
-                @confirm="del(scope.row)">
-                <template #reference>
-                  <el-button size="small" type="danger">删除</el-button>
-                </template>
-              </el-popconfirm>
-            </div>
-          </div>
-        </template>
-      </el-table-column>
-    </template>
-    <template v-else>
-      <el-table-column prop="portrait" label="肖像">
-        <template #default="scope">
-          <template v-if="c('figure:portrait:r')">
-            <img class="cal-img" v-if="scope.row.portrait" @click="viewFile(scope.row)"
-              :src="src(scope.row.portrait.id)" :alt="scope.row.name" height="60" />
-          </template>
-          <el-tooltip v-else content="需要【figure:portrait:r】权限">
-            <el-icon>
-              <lock />
-            </el-icon>
-          </el-tooltip>
-        </template>
-      </el-table-column>
-      <el-table-column prop="name" label="名字">
-        <template #default="scope">
-          <span v-if="c('figure:name:r')">{{ scope.row.name }}</span>
+        <el-tooltip v-else content="需要【figure:portrait:r】权限">
+          <el-icon>
+            <lock />
+          </el-icon>
+        </el-tooltip>
+      </div>
+      <div class="cal-col11">
+        <div prop="name">
+          <span v-if="c('figure:name:r')">{{ v.name }}</span>
           <el-tooltip v-else content="需要【figure:name:r】权限">
             <el-icon>
               <lock />
             </el-icon>
           </el-tooltip>
-        </template>
-      </el-table-column>
-      <el-table-column prop="fullname" label="全名">
-        <template #default="scope">
-          <span v-if="c('figure:fullname:r')">{{ scope.row.fullname }}</span>
-          <el-tooltip v-else content="需要【figure:fullname:r】权限">
-            <el-icon>
-              <lock />
-            </el-icon>
-          </el-tooltip>
-        </template>
-      </el-table-column>
-      <el-table-column prop="birthday" label="生辰">
-        <template #default="scope">
-          <span v-if="c('figure:birthday:r')">{{ solarText(scope.row.birthday) }}</span>
+        </div>
+        <div prop="birthday">
+          <span v-if="c('figure:birthday:r')">{{ solarText(v.birthday) }}</span>
           <el-tooltip v-else content="需要【figure:birthday:r】权限">
             <el-icon>
               <lock />
             </el-icon>
           </el-tooltip>
-        </template>
-      </el-table-column>
-      <el-table-column prop="deathday" label="忌辰">
-        <template #default="scope">
-          <span v-if="c('figure:deathday:r')">{{ solarText(scope.row.deathday) }}</span>
+          -
+          <span v-if="c('figure:deathday:r')">{{ solarText(v.deathday) }}</span>
           <el-tooltip v-else content="需要【figure:deathday:r】权限">
             <el-icon>
               <lock />
             </el-icon>
           </el-tooltip>
-        </template>
-      </el-table-column>
-      <el-table-column prop="remark" label="备注">
-        <template #default="scope">
-          <span v-if="c('figure:remark:r')">{{ scope.row.remark }}</span>
+        </div>
+        <div prop="fullname">
+          <span v-if="c('figure:fullname:r')">{{ v.fullname }}</span>
+          <el-tooltip v-else content="需要【figure:fullname:r】权限">
+            <el-icon>
+              <lock />
+            </el-icon>
+          </el-tooltip>
+        </div>
+      </div>
+    </div>
+    <div class="cal-col2">
+      <div class="cal-col11">
+        <div prop="remark">
+          <span v-if="c('figure:remark:r')">{{ v.remark }}</span>
           <el-tooltip v-else content="需要【figure:remark:r】权限">
             <el-icon>
               <lock />
             </el-icon>
           </el-tooltip>
-        </template>
-      </el-table-column>
-      <el-table-column prop="createTime" label="创建时间">
-        <template #default="scope">
-          <span v-if="c('figure:createTime:r')">{{ formatDate(scope.row.createTime) }}</span>
+        </div>
+        <div prop="createTime">
+          <span v-if="c('figure:createTime:r')">{{ formatDate(v.createTime) }}</span>
           <el-tooltip v-else content="需要【figure:createTime:r】权限">
             <el-icon>
               <lock />
             </el-icon>
           </el-tooltip>
-        </template>
-      </el-table-column>
-      <el-table-column prop="updateTime" label="更新时间">
-        <template #default="scope">
-          <span v-if="c('figure:updateTime:r')">{{ formatDate(scope.row.updateTime) }}</span>
+        </div>
+        <div prop="updateTime">
+          <span v-if="c('figure:updateTime:r')">{{ formatDate(v.updateTime) }}</span>
           <el-tooltip v-else content="需要【figure:updateTime:r】权限">
             <el-icon>
               <lock />
             </el-icon>
           </el-tooltip>
-        </template>
-      </el-table-column>
-      <el-table-column label="操作">
-        <template #default="scope">
-          <el-button size="small" type="primary" @click="edit(scope.row)">编辑</el-button>
-          <el-popconfirm confirm-button-text="没错" cancel-button-text="斟酌一下" title="确定要删除？" @confirm="del(scope.row)">
+        </div>
+        <div prop="action">
+          <el-button size="small" type="primary" @click="edit(v)">编辑</el-button>
+          <el-popconfirm confirm-button-text="没错" cancel-button-text="斟酌一下" title="确定要删除？" @confirm="del(v)">
             <template #reference>
               <el-button size="small" type="danger">删除</el-button>
             </template>
           </el-popconfirm>
-        </template>
-      </el-table-column>
-    </template>
-
-    <template #append>
-      <el-button class="cal-load-btn" :disabled="loading" :loading="loading" type="primary" text @click="load">加载更多
-      </el-button>
-    </template>
-  </el-table>
+        </div>
+      </div>
+      <div prop="select">
+        <el-checkbox />
+      </div>
+    </div>
+  </div>
+  <el-button class="cal-load-btn" :disabled="loading" :loading="loading" type="primary" text @click="load">加载更多
+  </el-button>
 </template>
+
+<style>
+.cal-table-figure-list {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.cal-col11 {
+  flex-grow: 1;
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.cal-table-select {
+  align-items: center;
+}
+
+.cal-table-data {
+  display: flex;
+}
+
+.cal-table-figure-list div[prop="portrait"] {
+  flex-basis: 80px;
+  flex-shrink: 0;
+  margin-right: .5rem;
+}
+
+.cal-table-figure-list div[prop="name"] {
+  flex-grow: 1;
+  flex-basis: 100px;
+}
+
+.cal-table-figure-list div[prop="birthday"] {
+  flex-grow: 1;
+  flex-basis: 200px;
+}
+
+.cal-table-figure-list div[prop="fullname"] {
+  flex-basis: 100%;
+}
+
+.cal-table-figure-list div[prop="remark"] {
+  flex-basis: 100%;
+}
+
+.cal-table-figure-list div[prop="createTime"] {
+  flex-basis: 130px;
+  flex-grow: 1;
+}
+
+.cal-table-figure-list div[prop="updateTime"] {
+  flex-basis: 130px;
+  flex-grow: 1;
+}
+
+.cal-table-figure-list div[prop="action"] {
+  flex-basis: 110px;
+  flex-grow: 1;
+}
+
+.cal-table-figure-list div[prop="select"] {
+  align-self: center;
+}
+
+.cal-table-figure-list .cal-col1 {
+  display: flex;
+}
+
+.cal-table-figure-list .cal-col2 {
+  display: flex;
+}
+
+@media screen and (max-width: 528px) {
+
+  .cal-table-figure-list .cal-col1 {
+    flex-basis: 100%;
+  }
+
+  .cal-table-figure-list .cal-col2 {
+    flex-basis: 100%;
+  }
+}
+
+@media screen and (min-width: 528px) {
+  .cal-table-figure-list .cal-col1 {
+    flex-basis: 50%;
+  }
+
+  .cal-table-figure-list .cal-col2 {
+    flex-basis: 50%;
+  }
+}
+</style>
